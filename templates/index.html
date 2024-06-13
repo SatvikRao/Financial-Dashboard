@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Weavers</title>
+    <link rel="icon" href="../static/logo.jpeg" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            background-image: url(https://wallpapers.com/images/hd/black-color-background-klz44x5h9f1m2ggg.jpg);
+            background-color: aliceblue;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            font-family: 'Roboto', sans-serif;
+            /* overflow: hidden; Prevent scrolling caused by background animation */
+            color: #fff;
+            margin: 5% 5% 5% 5%;
+        }
+
+        .navbar {
+            background-color: #b4d4ff;
+        }
+
+        .btn-primary {
+            background-color: #86b6f6;
+            border-color: #86b6f6;
+        }
+
+        .btn-primary:hover {
+            background-color: #6176b8;
+            border-color: #6176b8;
+        }
+
+        .logo {
+            max-width: 50px;
+            margin-right: 10px;
+        }
+
+        /* Center the login and signup buttons */
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background images */
+        .background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1; /* Ensure background is behind other content */
+        }
+
+        .background-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            animation: float 15s infinite linear;
+        }
+
+        .about-box {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .about-box h3 {
+            color: #333;
+        }
+
+        .about-box p {
+            color: #666;
+        }
+
+        /* Make the About Us section cover the entire page */
+        .full-page {
+            min-height: 100vh;
+            height: auto;
+            padding-top: 60px; /* Adjust based on navbar height */
+        }
+
+        /* Adjust padding for smaller screens */
+        @media (max-width: 768px) {
+            .full-page {
+                padding-top: 100px; /* Adjust based on navbar height */
+            }
+        }
+
+        /* body {
+	        background: #262a2b;
+        } */
+        .tilesWrap {
+            padding: 0;
+            margin: 50px auto;
+            list-style: none;
+            text-align: center;
+        }
+        .tilesWrap li {
+            display: inline-block;
+            width: 30%;
+            min-width: 200px;
+            padding: 300px 20px 300px;
+            position: relative;
+            vertical-align: top;
+            margin: 10px;
+            font-family: 'helvetica', san-serif;
+            min-height: 25vh;
+            background: #262a2b;
+            border: 1px solid #252727;
+            text-align: left;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            opacity: 1;
+            
+        }
+
+        .tilesWrap li:hover >h3{
+            background-color: rgba(0, 0, 0, 0.493);
+        }
+        .tilesWrap li:hover >p{
+            background-color: rgba(0, 0, 0, 0.507);
+        }
+
+        .tilesWrap li h2 {
+            font-size: 114px;
+            margin: 0;
+            position: absolute;
+            opacity: 0.2;
+            top: 50px;
+            right: 10px;
+            transition: all 0.3s ease-in-out;
+        }
+        .tilesWrap li h3 {
+            font-size: 20px;
+            color: #b7b7b7;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .tilesWrap li p {
+            font-size: 16px;
+            line-height: 18px;
+            color: #06fcb2;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .tilesWrap li button {
+            background: transparent;
+            border: 1px solid #b7b7b7;
+            padding: 10px 20px;
+            color: #b7b7b7;
+            border-radius: 3px;
+            position: relative;
+            transition: all 0.3s ease-in-out;
+            transform: translateY(-40px);
+            opacity: 0;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .tilesWrap li button:before {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 120%;
+            background: #b7b7b7;
+            top: 0;
+            opacity: 0;
+            left: -140px;
+            border-radius: 0 20px 20px 0;
+            z-index: -1;
+            transition: all 0.3s ease-in-out;
+            
+        }
+        .tilesWrap li:hover button {
+            transform: translateY(5px);
+            opacity: 1;
+        }
+        .tilesWrap li button:hover {
+            color: #262a2b;
+        }
+        .tilesWrap li button:hover:before {
+            left: 0;
+            opacity: 1;
+        }
+        .tilesWrap li:hover h2 {
+            top: 0px;
+            opacity: 0.6;
+        }
+
+        .tilesWrap li:before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: #fff;
+            transform: skew(2deg, 2deg);
+        }
+        .tilesWrap li:after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .tilesWrap li:nth-child(1):before {
+            background: #C9FFBF;
+        background: -webkit-linear-gradient(to right, #FFAFBD, #C9FFBF);
+        background: linear-gradient(to right, #FFAFBD, #C9FFBF);
+        }
+        .tilesWrap li:nth-child(2):before {
+            background: #f2709c;
+        background: -webkit-linear-gradient(to right, #ff9472, #f2709c);
+        background: linear-gradient(to right, #ff9472, #f2709c);
+        }
+        .tilesWrap li:nth-child(3):before {
+            background: #c21500;
+        background: -webkit-linear-gradient(to right, #ffc500, #c21500);
+        background: linear-gradient(to right, #ffc500, #c21500);
+        }
+        .tilesWrap li:nth-child(4):before {
+            background: #FC354C;
+        background: -webkit-linear-gradient(to right, #0ABFBC, #FC354C);
+        background: linear-gradient(to right, #0ABFBC, #FC354C);
+        }
+        .nav-item {
+            position: relative;
+        }
+
+        .underline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #000;
+            transition: width 0.2s ease;
+        }
+        .nav-link.active + .underline {
+            width: 100%;
+        }
+
+
+.button-49,
+.button-49:after {
+  width: 150px;
+  height: 76px;
+  line-height: 78px;
+  font-size: 20px;
+  font-family: 'Bebas Neue', sans-serif;
+  background: linear-gradient(45deg, transparent 5%, #FF013C 5%);
+  border: 0;
+  color: #fff;
+  letter-spacing: 3px;
+  box-shadow: 6px 0px 0px #00E6F6;
+  outline: transparent;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-49:after {
+  --slice-0: inset(50% 50% 50% 50%);
+  --slice-1: inset(80% -6px 0 0);
+  --slice-2: inset(50% -6px 30% 0);
+  --slice-3: inset(10% -6px 85% 0);
+  --slice-4: inset(40% -6px 43% 0);
+  --slice-5: inset(80% -6px 5% 0);
+  
+  content: 'ISS KI MA KI';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 3%, #00E6F6 3%, #00E6F6 5%, #FF013C 5%);
+  text-shadow: -3px -3px 0px #F8F005, 3px 3px 0px #00E6F6;
+  clip-path: var(--slice-0);
+}
+
+.button-49:hover:after {
+  animation: 1s glitch;
+  animation-timing-function: steps(2, end);
+}
+
+@keyframes glitch {
+  0% {
+    clip-path: var(--slice-1);
+    transform: translate(-20px, -10px);
+  }
+  10% {
+    clip-path: var(--slice-3);
+    transform: translate(10px, 10px);
+  }
+  20% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 10px);
+  }
+  30% {
+    clip-path: var(--slice-3);
+    transform: translate(0px, 5px);
+  }
+  40% {
+    clip-path: var(--slice-2);
+    transform: translate(-5px, 0px);
+  }
+  50% {
+    clip-path: var(--slice-3);
+    transform: translate(5px, 0px);
+  }
+  60% {
+    clip-path: var(--slice-4);
+    transform: translate(5px, 10px);
+  }
+  70% {
+    clip-path: var(--slice-2);
+    transform: translate(-10px, 10px);
+  }
+  80% {
+    clip-path: var(--slice-5);
+    transform: translate(20px, -10px);
+  }
+  90% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 0px);
+  }
+  100% {
+    clip-path: var(--slice-1);
+    transform: translate(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .button-49,
+  .button-49:after {
+    width: 200px;
+    height: 86px;
+    line-height: 88px;
+  }
+}
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+.container1 {
+  max-width: 800px;
+  background: #fff;
+  width: 80%; /* Adjust width as needed */
+  padding: 25px 40px 10px 40px;
+  color: #333;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin: auto; /* Center horizontally */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center vertically */
+}
+
+.container1 .text{
+  text-align: center;
+  font-size: 41px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  background: -webkit-linear-gradient(right, #56d8e4, #9f01ea, #56d8e4, #9f01ea);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.container1 form{
+  padding: 30px 0 0 0;
+}
+.container1 form .form-row{
+  display: flex;
+  margin: 32px 0;
+}
+form .form-row .input-data{
+  width: 100%;
+  height: 40px;
+  margin: 0 20px;
+  position: relative;
+}
+form .form-row .textarea{
+  height: 70px;
+}
+.input-data input,
+.textarea textarea{
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  font-size: 17px;
+  border-bottom: 2px solid rgba(0,0,0, 0.12);
+}
+.input-data input:focus ~ label, .textarea textarea:focus ~ label,
+.input-data input:valid ~ label, .textarea textarea:valid ~ label{
+  transform: translateY(-20px);
+  font-size: 14px;
+  color: #3498db;
+}
+.textarea textarea{
+  resize: none;
+  padding-top: 10px;
+}
+.input-data label{
+  position: absolute;
+  pointer-events: none;
+  bottom: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.textarea label{
+  width: 100%;
+  bottom: 40px;
+  background: #fff;
+}
+.input-data .underline{
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+}
+.input-data .underline:before{
+  position: absolute;
+  content: "";
+  height: 2px;
+  width: 100%;
+  background: #3498db;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+.input-data input:focus ~ .underline:before,
+.input-data input:valid ~ .underline:before,
+.textarea textarea:focus ~ .underline:before,
+.textarea textarea:valid ~ .underline:before{
+  transform: scale(1);
+}
+.submit-btn .input-data{
+  overflow: hidden;
+  height: 45px!important;
+  width: 25%!important;
+}
+.submit-btn .input-data .inner{
+  height: 100%;
+  width: 300%;
+  position: absolute;
+  left: -100%;
+  background: -webkit-linear-gradient(right, #56d8e4, #9f01ea, #56d8e4, #9f01ea);
+  transition: all 0.4s;
+}
+.submit-btn .input-data:hover .inner{
+  left: 0;
+}
+.submit-btn .input-data input{
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 700px) {
+  .container1 .text{
+    font-size: 30px;
+  }
+  .container1 form{
+    padding: 10px 0 0 0;
+  }
+  .container1 form .form-row{
+    display: block;
+  }
+  form .form-row .input-data{
+    margin: 35px 0!important;
+  }
+  .submit-btn .input-data{
+    width: 40%!important;
+  }
+}
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-image: url(https://t3.ftcdn.net/jpg/04/49/74/10/360_F_449741015_7wFz1d5e1voLD3arDjsyST3TtQkZAhg6.jpg);">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" style="font-weight: bolder;" href="#home">Home</a>
+                        <div class="underline"></div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" style="font-weight: bolder;" href="#aboutus">Team</a>
+                        <div class="underline"></div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" style="font-weight: bolder;" href="#contact">Contact Us</a>
+                        <div class="underline"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Home Section -->
+    <div class="center-container" id="home">
+        
+        <div class="text-center">
+            <h1 style="font-size: 8vh; font-weight: bolder; margin: 20px;">Get Started</h1>
+            
+            <div class="mb-3" style="font-family: sans-serif; font-weight: bold;">
+              <a style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold;" href="/login"><button class="button-49">Login</button></a>
+                <span class="text-white mx-3" style="font-size: 5vh;">or</span>
+                <a style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold;" href="/signup"><button class="button-49">Sign Up</button></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Us Section -->
+    <div class="container-fluid mt-5 full-page" id="aboutus">
+        <h1 class="text-center mb-4" style="font-size: 7vh; font-weight: bolder;">Team</h1>
+        <ul class="tilesWrap">
+            <li style="background-image: url(../static/Radha.jpeg);">
+                <h2>01</h2>
+                <h3>Radha Runghta</h3>
+                <p>
+                    I am a CSE Student at IIIT Hyderabad.
+                </p>
+            </li>
+            <li style="background-image: url(../static/Harshita.jpeg);">
+                <h2>02</h2>
+                <h3>Harshita Kumari</h3>
+                <p>
+                    I am an ECE student at IIIT Hyderabad.
+                </p>
+            </li>
+            <li style="background-image: url(../static/satvik.jpeg);">
+                <h2>03</h2>
+                <h3>Satvik Rao</h3>
+                <p>
+                    I am a CHD student at IIIT Hyderabad.
+                </p>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Contact Us Section -->
+    <div class="container1" id="contact" style="bottom: 10vh; right: 10vh;">
+        <div class="text">
+           Contact us Form
+        </div>
+        <form action="#">
+           <div class="form-row">
+              <div class="input-data">
+                 <input type="text" required>
+                 <div class="underline"></div>
+                 <label for="">First Name</label>
+              </div>
+              <div class="input-data">
+                 <input type="text" required>
+                 <div class="underline"></div>
+                 <label for="">Last Name</label>
+              </div>
+           </div>
+           <div class="form-row">
+              <div class="input-data">
+                 <input type="text" required>
+                 <div class="underline"></div>
+                 <label for="">Email Address</label>
+              </div>
+              <div class="input-data">
+                 <input type="text" required>
+                 <div class="underline"></div>
+                 <label for="">Website Name</label>
+              </div>
+           </div>
+           <div class="form-row">
+           <div class="input-data textarea">
+              <textarea rows="8" cols="80" required></textarea>
+              <br />
+              <div class="underline"></div>
+              <label for="">Write your message</label>
+              <br />
+              <div class="form-row submit-btn">
+                 <div class="input-data">
+                    <div class="inner"></div>
+                    <input type="submit" value="submit">
+                 </div>
+              </div>
+        </form>
+        </div>
+
+    <!-- Bootstrap JS and Popper.js (required for Bootstrap components to work) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Smooth scroll script -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+
+<script>var navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach((link, index) => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var current = document.querySelector('.active');
+            if(current){
+                current.classList.remove('active');
+                current.nextElementSibling.style.width = '0';
+            }
+            this.classList.add('active');
+            this.nextElementSibling.style.width = '100%';
+        });
+    });</script>
+</body>
+
+</html>
