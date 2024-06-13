@@ -6,9 +6,27 @@ import secrets
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(24)  # Securely generated secret key
 
+def connect_to_database():
+    conn_params = {
+        'host': 'financial-dashboard-4996.7s5.aws-ap-south-1.cockroachlabs.cloud',
+        'port': 26257,
+        'user': 'satvik',
+        'password': 'RWU4tpbY_rQDSuaY7O3jEQ',
+        'database': 'defaultdb',
+        'sslmode': 'verify-full',
+        'sslrootcert': 'root.crt' # Replace with the correct path
+    }
+
+    conn_str = "host={host} port={port} user={user} password={password} dbname={database} sslmode={sslmode} sslrootcert={sslrootcert}".format(**conn_params)
+    #postgresql://web-weavers:<ENTER-SQL-USER-PASSWORD>@web-weavers-4063.7s5.aws-ap-south-1.cockroachlabs.cloud:26257/ISS_users?sslmode=verify-full
+    # Connect to the database
+    try:
+        conn = psycopg2.connect(conn_str)
+        return conn
+    except psycopg2.OperationalError as e:
+        return None
 # Database connection setup
-connection = "postgresql://satvik:RWU4tpbY_rQDSuaY7O3jEQ@financial-dashboard-4996.7s5.aws-ap-south-1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full"
-con = psycopg2.connect(connection)
+con = connect_to_database()
 cur = con.cursor()
 
 def create_table():
