@@ -124,11 +124,22 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/home/<username>')
+@app.route('/home/<username>', methods=['GET', 'POST'])
 @login_required
 def home(username):
-    return f"Welcome, {username}!"
-
+    #if request.method == 'POST' :
+    cur.execute("SELECT UserMoney.UserIncome FROM UserDetails JOIN UserMoney ON UserDetails.UserId = UserMoney.UserId WHERE UserDetails.UserName=%s;",(username,))
+    con.commit()
+    income = cur.fetchone()
+    if income is None:
+        income = (0,)
+    cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName =%s;",(username,))
+    con.commit()
+    transnum = cur.fetchone()
+    if transnum is None:
+        transnum=(0,)
+    return render_template('home.html', username=username , income=income[0], transnum=transnum[0] )
+ 
 if __name__ == '__main__':
     app.run(debug=True)
 

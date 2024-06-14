@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #000000;
+        }
+        .card {
+            display: inline-block;
+            width: 30%;
+            margin: 10px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            min-width: fit-content;
+        }
+        .card h2 {
+            text-decoration: none;
+            margin-top: 0;
+            font-size: 1.5em;
+            color: #333;
+        }
+        .card p {
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 10px 0;
+            color: #555;
+        }
+        .income { background-color: #e0f7fa; }
+        .expenses { background-color: #ffebee; }
+        .savings { background-color: #e8f5e9; }
+        .transactions{ background-color: rgb(248, 248, 209); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Finance Dashboard</h1>
+        </div>
+        <div class="small">
+            <div class="card income">
+                <h2>Income</h2>
+                <p id="income-value" alt="0">${{income}}</p>
+            </div>
+            <div class="card expenses">
+                <h2>Expenses</h2>
+                <p id="expenses-value">0%</p>
+            </div>
+            <div class="card savings">
+                <h2>Savings</h2>
+                <p id="savings-value">0%</p>
+            </div>
+        </div>
+    </div>
+    <div >
+        <a href="/transactions"  >
+        <div class="card transactions">
+            <h2 class="subhead">Transactions</h2>
+            <p>{{transnum}} no. of transactions made</p>
+        </div>
+        </a>
+    </div>
+
+</body>
+</html>
