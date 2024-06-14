@@ -14,23 +14,26 @@ def connect_to_database():
         'password': 'RWU4tpbY_rQDSuaY7O3jEQ',
         'database': 'defaultdb',
         'sslmode': 'verify-full',
-        'sslrootcert': 'root.crt' # Replace with the correct path
+        'sslrootcert': 'root.crt'  # Replace with the correct path
     }
 
     conn_str = "host={host} port={port} user={user} password={password} dbname={database} sslmode={sslmode} sslrootcert={sslrootcert}".format(**conn_params)
-    #postgresql://web-weavers:<ENTER-SQL-USER-PASSWORD>@web-weavers-4063.7s5.aws-ap-south-1.cockroachlabs.cloud:26257/ISS_users?sslmode=verify-full
-    # Connect to the database
     try:
         conn = psycopg2.connect(conn_str)
         return conn
     except psycopg2.OperationalError as e:
+        print("Could not connect to the database:", e)
         return None
+
 # Database connection setup
 con = connect_to_database()
+if con is None:
+    print("Database connection failed. Exiting...")
+    exit(1)
 cur = con.cursor()
 
 def create_table():
-    create_table_query = """
+    create_user_table_query = """
     CREATE TABLE IF NOT EXISTS UserDetails (
         UserId SERIAL PRIMARY KEY,
         UserName VARCHAR(255) NOT NULL UNIQUE,
@@ -38,7 +41,15 @@ def create_table():
         UserPassword VARCHAR(255) NOT NULL
     );
     """
-    cur.execute(create_table_query)
+    cur.execute(create_user_table_query)
+    
+    create_user_money_table_query = """
+    CREATE TABLE IF NOT EXISTS UserMoney (
+        UserId INTEGER PRIMARY KEY REFERENCES UserDetails(UserId),
+        UserIncome NUMERIC NOT NULL
+    );
+    """
+    cur.execute(create_user_money_table_query)
     con.commit()
 
 create_table()
