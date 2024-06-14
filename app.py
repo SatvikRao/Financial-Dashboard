@@ -50,6 +50,18 @@ def create_table():
     );
     """
     cur.execute(create_user_money_table_query)
+    
+    create_user_transaction_table_query = """
+    CREATE TABLE IF NOT EXISTS UserTransaction (
+        TransactionId SERIAL PRIMARY KEY,
+        UserId INTEGER REFERENCES UserDetails(UserId),
+        Amount DECIMAL(10, 2) NOT NULL,
+        Reason VARCHAR(255) NOT NULL,
+        TransactionType VARCHAR(10) CHECK (TransactionType IN ('withdraw', 'deposit')) NOT NULL
+    );
+    """
+    cur.execute(create_user_transaction_table_query)
+    
     con.commit()
 
 create_table()
