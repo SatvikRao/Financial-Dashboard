@@ -22,7 +22,7 @@
         h1 {
             text-align: center;
         }
-        form{
+        form {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
@@ -76,44 +76,41 @@
 <div class="container">
     <h1>Finance Budgeting</h1>
 
-    <form id="transaction-form">
-        
-            <div>
-                <label for="date">Date</label>
-                <input type="date" id="date" required>
-            </div>
-            <div>
-                <label for="category">Category</label>
-                <!-- <input type="text" id="category" required> -->
-                <select id="type" required>
-                    <option value="insurance">insurance</option>
-                    <option value="stocks">stocks</option>
-                    <option value="furniture">furniture</option>
-                    <option value="grocery">grocery</option>
-                    <option value="electronics">electronics</option>
-                    <option value="real_estate">real estate</option>
-                    <option value="medical">medical</option>
-                    <option value="loan">loan</option>
-                    <option value="food">food</option>
-                    <option value="rent">rent</option>
-                    <option value="education">education</option>
-                    <option value="electricity">electricity</option>
-                    <option value="entertainment">entertainment</option>
-                    <option value="others">others</option>
-                </select>
-            </div>
-            <div>
-                <label for="amount">Amount</label>
-                <input type="number" id="amount" required>
-            </div>
-            <div>
-                <label for="type">Type</label>
-                <select id="type" required>
-                    <option value="deposit">Deposit</option>
-                    <option value="withdrawal">Withdrawal</option>
-                </select>
-            </div>
-        
+    <form id="transaction-form" method="post" action="/transactions/{{ username }}">
+        <div>
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+        <div>
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+                <option value="insurance">Insurance</option>
+                <option value="stocks">Stocks</option>
+                <option value="furniture">Furniture</option>
+                <option value="grocery">Grocery</option>
+                <option value="electronics">Electronics</option>
+                <option value="real_estate">Real Estate</option>
+                <option value="medical">Medical</option>
+                <option value="loan">Loan</option>
+                <option value="food">Food</option>
+                <option value="rent">Rent</option>
+                <option value="education">Education</option>
+                <option value="electricity">Electricity</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="others">Others</option>
+            </select>
+        </div>
+        <div>
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" name="amount" required>
+        </div>
+        <div>
+            <label for="type">Type</label>
+            <select id="type" name="type" required>
+                <option value="deposit">Deposit</option>
+                <option value="withdraw">Withdraw</option>
+            </select>
+        </div>
         <div class="full-width">
             <label>&nbsp;</label>
             <button type="submit">Add Transaction</button>
@@ -131,18 +128,21 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Transactions will be dynamically added here -->
             {% for element in elements %}
             <tr>
-                <td>{{ element[-1] }}</td>
-                <td>{{ element[2]}}</td>
-                <td>{{ element[1] }}</td>
-                <td>{{ element[-2] }}</td>
+                <td>{{ element[5] }}</td>
+                <td>{{ element[2] }}</td>
+                <td>{{ element[4] }}</td>
+                <td>{{ element[3] }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+</body>
+</html>
+
 <!--
 <script>
     document.getElementById('transaction-form').addEventListener('submit', function(e) {
@@ -178,6 +178,3 @@
     }
 </script>
 -->
-
-</body>
-</html>

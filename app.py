@@ -50,18 +50,19 @@ def create_table():
     );
     """
     cur.execute(create_user_money_table_query)
-
+    
     create_user_transaction_table_query = """
     CREATE TABLE IF NOT EXISTS UserTransaction (
         TransactionId SERIAL PRIMARY KEY,
         UserId INTEGER REFERENCES UserDetails(UserId),
         Amount DECIMAL(10, 2) NOT NULL,
-        TransactionDate DATE NOT NULL,
         Reason VARCHAR(255) NOT NULL,
-        TransactionType VARCHAR(10) CHECK (TransactionType IN ('withdraw', 'deposit')) NOT NULL
+        TransactionType VARCHAR(10) CHECK (TransactionType IN ('withdraw', 'deposit')) NOT NULL,
+        TransactionDate DATE NOT NULL
     );
     """
     cur.execute(create_user_transaction_table_query)
+    
     con.commit()
 
 create_table()
@@ -87,18 +88,6 @@ def write_user(username, email, password):
         print("User added successfully")
     except Exception as e:
         print("Error adding user:", e)
-
-def add_transaction(username , date , category , amount , type):
-    try:
-        cur.execute("SELECT UserId FROM UserDetails WHERE UserName =%s;",(username))
-        con.commit()
-        userid = cur.fetchone()
-        cur.execute("INSERT INTO UserTransaction (UserId , Amount  , Reason , TransactionType, TransactionDate) VALUES (%s ,%s ,%s, %s, %s);", (userid , amount , category ,type, date))
-        con.commit()
-        print('transaction added successfully')
-    except Exception as e:
-        print("Error adding transaction:", e)
-
 
 # Signup route
 @app.route('/signup', methods=['GET', 'POST'])
@@ -139,41 +128,47 @@ def login():
 @app.route('/home/<username>', methods=['GET', 'POST'])
 @login_required
 def home(username):
-    #if request.method == 'POST' :
-    cur.execute("SELECT UserMoney.UserIncome FROM UserDetails JOIN UserMoney ON UserDetails.UserId = UserMoney.UserId WHERE UserDetails.UserName=%s;",(username,))
+    cur.execute("SELECT UserMoney.UserIncome FROM UserDetails JOIN UserMoney ON UserDetails.UserId = UserMoney.UserId WHERE UserDetails.UserName=%s;", (username,))
     con.commit()
     income = cur.fetchone()
     if income is None:
         income = (0,)
-    cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName =%s;",(username,))
+    cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName =%s;", (username,))
     con.commit()
     transnum = cur.fetchone()
     if transnum is None:
-        transnum=(0,)
-    return render_template('home.html', username=username , income=income[0], transnum=transnum[0] )
-    #return f'goo {username}'
-    #return render_template('home.html', username=username, income=None, transnum=None)
+        transnum = (0,)
+    return render_template('home.html', username=username, income=income[0], transnum=transnum[0])
 
-    #return render_template('home.html', username=username , income=income , transnum=transnum )
-
-@app.route('/transactions/<username>',methods=['GET', 'POST'])
+@app.route('/transactions/<username>', methods=['GET', 'POST'])
 @login_required
 def transactions(username):
-    if request.method == 'POST' :
+    if request.method == 'POST':
         date = request.form['date']
         category = request.form['category']
         amount = request.form['amount']
         type = request.form['type']
-        add_transaction(username , date, category , amount ,type)
-    
-    cur.execute("SELECT UserId FROM UserDetails WHERE UserName =%s;",(username,))
+        add_transaction(username, date, category, amount, type)
+        return "Transaction added successfully."
+
+    cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
     con.commit()
     userid = cur.fetchone()
-    cur.execute("SELECT * FROM UserTransaction WHERE UserId = %s",(userid,))
+    cur.execute("SELECT * FROM UserTransaction WHERE UserId = %s;", (userid,))
     con.commit()
     elements = cur.fetchall()
-    return render_template('transactions.html',elements=elements )
+    return render_template('transactions.html', elements=elements, username=username)
 
+def add_transaction(username, date, category, amount, type):
+    try:
+        cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+        con.commit()
+        userid = cur.fetchone()
+        cur.execute("INSERT INTO UserTransaction (UserId, Amount, Reason, TransactionType, TransactionDate) VALUES (%s, %s, %s, %s, %s);", (userid[0], amount, category, type, date))
+        con.commit()
+        print('Transaction added successfully')
+    except Exception as e:
+        print("Error adding transaction:", e)
 
 if __name__ == '__main__':
     app.run(debug=True)
