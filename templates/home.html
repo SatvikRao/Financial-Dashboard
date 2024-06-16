@@ -80,7 +80,7 @@
         </div>
     </div>
     <div >
-        <a href="/transactions"  >
+        <a href="{{ url_for('transactions', username=username) }}"  >
         <div class="card transactions">
             <h2 class="subhead">Transactions</h2>
             <p>{{transnum}} no. of transactions made</p>
