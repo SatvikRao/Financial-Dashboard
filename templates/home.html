@@ -89,7 +89,15 @@
         <a href="{{ url_for('transactions', username=username) }}"  >
         <div class="card transactions">
             <h2 class="subhead">Transactions</h2>
-            <p>{{transnum}} no. of transactions made</p>
+            <p>{{transnum}} transaction/s made</p>
+        </div>
+        </a>
+    </div>
+    <div >
+        <a href="{{ url_for('add_income', username=username) }}"  >
+        <div class="card transactions">
+            <h2 class="subhead">Add Income</h2>
+            <!-- <p>{{transnum}} no. of transactions made</p> -->
         </div>
         </a>
     </div>

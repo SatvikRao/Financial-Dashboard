@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Budgeting</title>
+    <title>Income Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -91,69 +91,38 @@
 <body>
 
 <div class="container">
-    <h1>Finance Budgeting</h1>
+    <h1>Income Report</h1>
     <a href="/home/{{username}}" class="home_butt">Go To Home</a>
-    <form id="transaction-form" method="post" action="/transactions/{{ username }}">
+    <form id="income-form" method="post" action="/add_income/{{ username }}">
         <div>
             <label for="date">Date</label>
             <input type="date" id="date" name="date" required>
         </div>
         <div>
-            <label for="category">Category</label>
-            <select id="category" name="category" required>
-                <option value="insurance">Insurance</option>
-                <option value="stocks">Stocks</option>
-                <option value="furniture">Furniture</option>
-                <option value="grocery">Grocery</option>
-                <option value="electronics">Electronics</option>
-                <option value="real_estate">Real Estate</option>
-                <option value="medical">Medical</option>
-                <option value="loan">Loan</option>
-                <option value="food">Food</option>
-                <option value="rent">Rent</option>
-                <option value="education">Education</option>
-                <option value="electricity">Electricity</option>
-                <option value="entertainment">Entertainment</option>
-                <option value="salary">Salary</option>
-                <option value="others">Others</option>
-            </select>
-        </div>
-        <div>
             <label for="amount">Amount</label>
             <input type="number" id="amount" name="amount" required>
         </div>
-        <div>
-            <label for="type">Type</label>
-            <select id="type" name="type" required>
-                <option value="deposit">Deposit</option>
-                <option value="withdraw">Withdraw</option>
-            </select>
-        </div>
         <div class="full-width">
             <label>&nbsp;</label>
-            <button type="submit">Add Transaction</button>
+            <button type="submit">Add Income</button>
         </div>
     </form>
     <hr>
-    <table id="transactions-table">
+    <table id="income-table">
         <thead>
             <tr>
                 <th>Date</th>
                 <th>Amount</th>
-                <th>Type</th>
-                <th>Category</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             {% for element in elements %}
             <tr>
-                <td>{{ element[5] }}</td>
-                <td>{{ element[2] }}</td>
-                <td>{{ element[4] }}</td>
                 <td>{{ element[3] }}</td>
+                <td>{{ element[2] }}</td>
                 <td>
-                    <form method="post" action="/delete_transaction/{{ element[0] }}">
+                    <form method="post" action="/delete_income/{{ element[0] }}">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="delete-button">Delete</button>
                     </form>

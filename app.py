@@ -45,8 +45,10 @@ def create_table():
     
     create_user_money_table_query = """
     CREATE TABLE IF NOT EXISTS UserMoney (
-        UserId INTEGER PRIMARY KEY REFERENCES UserDetails(UserId),
-        UserIncome NUMERIC NOT NULL
+        MoneyId SERIAL PRIMARY KEY,
+        UserId INTEGER REFERENCES UserDetails(UserId),
+        UserIncome DECIMAL(10,2) NOT NULL,
+        IncomeDate DATE NOT NULL
     );
     """
     cur.execute(create_user_money_table_query)
@@ -128,22 +130,23 @@ def login():
 @app.route('/home/<username>', methods=['GET', 'POST'])
 @login_required
 def home(username):
-    cur.execute("SELECT UserMoney.UserIncome FROM UserDetails JOIN UserMoney ON UserDetails.UserId = UserMoney.UserId WHERE UserDetails.UserName=%s;", (username,))
-    con.commit()
+    cur.execute("SELECT SUM(UserMoney.UserIncome) FROM UserDetails JOIN UserMoney ON UserDetails.UserId = UserMoney.UserId WHERE UserDetails.UserName=%s;", (username,))
     income = cur.fetchone()
-    cur.execute("SELECT SUM(UserTransaction.Amount) AS total_amount FROM UserTransaction JOIN UserDetails ON UserDetails.UserId = UserTransaction.UserId WHERE UserDetails.UserName = %s and UserTransaction.TransactionType='deposit'", (username,))
-    con.commit()
-    balance = cur.fetchone()
-    if income is None:
+    if income is None or income[0] is None:
         income = (0,)
-    if balance is None:
-        balance =(0,)
-    cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName =%s;", (username,))
-    con.commit()
+
+    cur.execute("SELECT SUM(UserTransaction.Amount) AS total_amount FROM UserTransaction JOIN UserDetails ON UserDetails.UserId = UserTransaction.UserId WHERE UserDetails.UserName = %s AND UserTransaction.TransactionType='deposit'", (username,))
+    balance = cur.fetchone()
+    if balance is None or balance[0] is None:
+        balance = (0,)
+
+    cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName = %s;", (username,))
     transnum = cur.fetchone()
-    if transnum is None:
+    if transnum is None or transnum[0] is None:
         transnum = (0,)
-    return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=balance[0])
+    variable = balance[0]+income[0]
+    return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=variable)
+
 
 @app.route('/transactions/<username>', methods=['GET', 'POST'])
 @login_required
@@ -191,6 +194,52 @@ def delete_transaction_by_id(transaction_id):
     cur.execute(delete_query, (transaction_id,))
     con.commit()
     print(f"Transaction {transaction_id} deleted successfully.")
+    return username
+
+@app.route('/add_income/<username>', methods=['GET', 'POST'])
+@login_required
+def add_income(username):
+    if request.method == 'POST':
+        date = request.form['date']
+        amount = request.form['amount']
+        input_income(username, date, amount)
+        #return "Transaction added successfully."
+
+    cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+    con.commit()
+    userid = cur.fetchone()
+    cur.execute("SELECT * FROM UserMoney WHERE UserId = %s;", (userid,))
+    con.commit()
+    elements = cur.fetchall()
+    return render_template('add_income.html', elements=elements, username=username)
+
+def input_income(username, date, amount):
+    try:
+        cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+        con.commit()
+        userid = cur.fetchone()
+        cur.execute("INSERT INTO UserMoney (UserId, UserIncome, IncomeDate) VALUES (%s, %s, %s);", (userid[0], amount, date))
+        con.commit()
+        print('Income added successfully')
+    except Exception as e:
+        print("Error adding income:", e)
+
+@app.route('/delete_income/<int:income_id>', methods=['POST'])
+def delete_income(income_id):
+    if request.form.get('_method') == 'DELETE':
+        # Assuming you have a function `delete_transaction_by_id` to delete the transaction
+        username =delete_income_by_id(income_id)
+    
+    return redirect(url_for('add_income', username=username[0]))
+
+def delete_income_by_id(income_id):
+    cur.execute("SELECT UserName FROM UserDetails JOIN UserMoney ON UserMoney.UserId = UserDetails.UserId WHERE UserMoney.MoneyId =%s;", (income_id,))
+    con.commit()
+    username = cur.fetchone()
+    delete_query = "DELETE FROM UserMoney WHERE MoneyId = %s"
+    cur.execute(delete_query, (income_id,))
+    con.commit()
+    print(f"Income {income_id} deleted successfully.")
     return username
 
 if __name__ == '__main__':
