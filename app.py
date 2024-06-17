@@ -131,14 +131,19 @@ def home(username):
     cur.execute("SELECT UserMoney.UserIncome FROM UserDetails JOIN UserMoney ON UserDetails.UserId = UserMoney.UserId WHERE UserDetails.UserName=%s;", (username,))
     con.commit()
     income = cur.fetchone()
+    cur.execute("SELECT SUM(UserTransaction.Amount) AS total_amount FROM UserTransaction JOIN UserDetails ON UserDetails.UserId = UserTransaction.UserId WHERE UserDetails.UserName = %s", (username,))
+    con.commit()
+    balance = cur.fetchone()
     if income is None:
         income = (0,)
+    if balance is None:
+        balance =(0,)
     cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName =%s;", (username,))
     con.commit()
     transnum = cur.fetchone()
     if transnum is None:
         transnum = (0,)
-    return render_template('home.html', username=username, income=income[0], transnum=transnum[0])
+    return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=balance[0])
 
 @app.route('/transactions/<username>', methods=['GET', 'POST'])
 @login_required
