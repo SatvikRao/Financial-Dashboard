@@ -131,7 +131,7 @@ def home(username):
     cur.execute("SELECT UserMoney.UserIncome FROM UserDetails JOIN UserMoney ON UserDetails.UserId = UserMoney.UserId WHERE UserDetails.UserName=%s;", (username,))
     con.commit()
     income = cur.fetchone()
-    cur.execute("SELECT SUM(UserTransaction.Amount) AS total_amount FROM UserTransaction JOIN UserDetails ON UserDetails.UserId = UserTransaction.UserId WHERE UserDetails.UserName = %s", (username,))
+    cur.execute("SELECT SUM(UserTransaction.Amount) AS total_amount FROM UserTransaction JOIN UserDetails ON UserDetails.UserId = UserTransaction.UserId WHERE UserDetails.UserName = %s and UserTransaction.TransactionType='deposit'", (username,))
     con.commit()
     balance = cur.fetchone()
     if income is None:
@@ -174,6 +174,24 @@ def add_transaction(username, date, category, amount, type):
         print('Transaction added successfully')
     except Exception as e:
         print("Error adding transaction:", e)
+
+@app.route('/delete_transaction/<int:transaction_id>', methods=['POST'])
+def delete_transaction(transaction_id):
+    if request.form.get('_method') == 'DELETE':
+        # Assuming you have a function `delete_transaction_by_id` to delete the transaction
+        username =delete_transaction_by_id(transaction_id)
+    
+    return redirect(url_for('transactions', username=username[0]))
+
+def delete_transaction_by_id(transaction_id):
+    cur.execute("SELECT UserName FROM UserDetails JOIN UserTransaction ON UserTransaction.UserId = UserDetails.UserId WHERE UserTransaction.TransactionId =%s;", (transaction_id,))
+    con.commit()
+    username = cur.fetchone()
+    delete_query = "DELETE FROM UserTransaction WHERE TransactionId = %s"
+    cur.execute(delete_query, (transaction_id,))
+    con.commit()
+    print(f"Transaction {transaction_id} deleted successfully.")
+    return username
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -135,6 +135,12 @@
                 <td>{{ element[2] }}</td>
                 <td>{{ element[4] }}</td>
                 <td>{{ element[3] }}</td>
+                <td>
+                    <form method="post" action="/delete_transaction/{{ element[0] }}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
