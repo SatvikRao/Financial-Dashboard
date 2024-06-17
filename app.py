@@ -149,7 +149,7 @@ def transactions(username):
         amount = request.form['amount']
         type = request.form['type']
         add_transaction(username, date, category, amount, type)
-        return "Transaction added successfully."
+        #return "Transaction added successfully."
 
     cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
     con.commit()
