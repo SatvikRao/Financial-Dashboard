@@ -66,10 +66,12 @@
             <h1>Finance Dashboard</h1>
         </div>
         <div class="small">
-            <div class="card income">
-                <h2>Income</h2>
-                <p id="income-value" alt="0">${{income}}</p>
-            </div>
+            <a href="{{ url_for('add_income', username=username) }}"  >
+                <div class="card income">
+                    <h2>Income</h2>
+                    <p id="income-value" alt="0">${{income}}</p>
+                </div>
+            </a>    
             <div class="card balance">
                 <h2>Balance</h2>
                 <p id="balance-value" alt="0">${{balance}}</p>
@@ -90,14 +92,6 @@
         <div class="card transactions">
             <h2 class="subhead">Transactions</h2>
             <p>{{transnum}} transaction/s made</p>
-        </div>
-        </a>
-    </div>
-    <div >
-        <a href="{{ url_for('add_income', username=username) }}"  >
-        <div class="card transactions">
-            <h2 class="subhead">Add Income</h2>
-            <!-- <p>{{transnum}} no. of transactions made</p> -->
         </div>
         </a>
     </div>
