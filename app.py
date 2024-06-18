@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session , jsonify
+from psycopg2 import extras
 import psycopg2
 from functools import wraps
 import secrets
-
+from datetime import datetime, timedelta
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(24)  # Securely generated secret key
 
@@ -241,9 +242,64 @@ def delete_income_by_id(income_id):
     con.commit()
     print(f"Income {income_id} deleted successfully.")
     return username
+@app.route('/view_stats/<username>')
+def view_stats(username):
+    return render_template('stats.html', username=username)
+
+@app.route('/data/today/<username>')
+@login_required
+def get_today_data(username):
+    cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+    con.commit()
+    userid = cur.fetchone()
+    print("yes",username)
+  #  if userid:
+   #     userid = userid[0]
+   # else:
+    #    return jsonify([])  # Handle case where username does not exist
+
+    with con.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
+        today_date = datetime.now().strftime('%Y-%m-%d')
+        query = """
+        SELECT reason AS category, SUM(amount) AS amount_spent
+        FROM UserTransaction
+        WHERE transactiontype = 'withdraw' AND transactiondate = %s AND userid = %s
+        GROUP BY reason
+        """
+        cursor.execute(query, (today_date, userid,))
+        data = cursor.fetchall()
+        print(data , ":haha")
+    return jsonify(data)
+
+@app.route('/data/last30days/<username>')
+@login_required
+def get_last_30_days_data(username):
+    cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+    con.commit()
+    userid = cur.fetchone()
+    print("yes")
+    if userid:
+        userid = userid[0]
+    else:
+        
+        return jsonify([])  # Handle case where username does not exist
+
+    with con.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
+        thirty_days_ago = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+        query = """
+        SELECT reason AS category, SUM(amount) AS amount_spent
+        FROM UserTransaction
+        WHERE transactiontype = 'withdraw' AND transactiondate >= %s AND userid = %s
+        GROUP BY reason
+        """
+        cursor.execute(query, (thirty_days_ago, userid,))
+        data = cursor.fetchall()
+        print(data)
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)
 
 cur.close()
 con.close()
+
