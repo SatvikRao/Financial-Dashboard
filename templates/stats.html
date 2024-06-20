@@ -6,181 +6,172 @@
     <title>Pie Chart with Tooltips</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-           .container-box {
-          
+        .container-box {
             padding: 20px;
             max-width: 800px;
             margin: 0 auto;
         }
         .chart-container {
             display: flex;
-            justify-content: space-between;
-        }
-        .chart {
-            width: 45%; /* Adjust width as needed */
-        }
-        .charts-wrapper {
-            display: flex;
             flex-direction: column;
             align-items: center;
+        }
+        .chart-box {
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .chart {
+            width: 100%;
+            height: 300px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container-box">
-    <div class="charts-wrapper">
-    <div class="chart-container">
-        <div class="chart">
+        <div class="chart-box">
             <h2>Today's Expenditures</h2>
-            <canvas id="expenditureChartToday" width="300" height="300"></canvas>
+            <button onclick="loadTodayData()">Show Today's Expenditures</button>
+            <div class="chart-container">
+                <canvas id="expenditureChartToday" class="chart"></canvas>
+            </div>
         </div>
-        <div class="chart">
+        <div class="chart-box">
             <h2>Last 30 Days Expenditures</h2>
-            <canvas id="expenditureChartLast30Days" width="300" height="300"></canvas>
+            <button onclick="loadLast30DaysData()">Show Last 30 Days Expenditures</button>
+            <div class="chart-container">
+                <canvas id="expenditureChartLast30Days" class="chart"></canvas>
+            </div>
         </div>
     </div>
-    </div>
-    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-    console.log("JavaScript is running..."); // Added log statement
+        function loadTodayData() {
+            const username = "{{ username }}";
+            fetch(`/data/today/${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    const categoriesToday = data.map(item => item[0]);
+                    const amountsToday = data.map(item => parseFloat(item[1]));
 
-    const username = "{{ username }}";
-    console.log(username)
-    // Fetch data for today's chart
-    fetch(`/data/today/${username}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Today's Data:", data); // Log data for debugging
-            const categoriesToday = data.map(item => item[0]);
-            const amountsToday = data.map(item => parseFloat(item[1]));
+                    if (categoriesToday.length === 0 || amountsToday.length === 0) {
+                        console.error("No data available for today's chart.");
+                        return;
+                    }
 
-            console.log("Categories Today:", categoriesToday); // Log categories
-            console.log("Amounts Today:", amountsToday); // Log amounts
-
-            if (categoriesToday.length === 0 || amountsToday.length === 0) {
-                console.error("No data available for today's chart.");
-                return;
-            }
-
-            const ctxToday = document.getElementById('expenditureChartToday').getContext('2d');
-            const expenditureChartToday = new Chart(ctxToday, {
-                type: 'pie',
-                data: {
-                    labels: categoriesToday,
-                    datasets: [{
-                        label: 'Expenditures by Category (Today)',
-                        data: amountsToday,
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    return `${label}: ${value}`;
+                    const ctxToday = document.getElementById('expenditureChartToday').getContext('2d');
+                    const expenditureChartToday = new Chart(ctxToday, {
+                        type: 'pie',
+                        data: {
+                            labels: categoriesToday,
+                            datasets: [{
+                                label: 'Expenditures by Category (Today)',
+                                data: amountsToday,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            return `${label}: ${value}`;
+                                        }
+                                    }
                                 }
                             }
                         }
+                    });
+
+                    // Show the chart
+                    document.getElementById('expenditureChartToday').style.display = 'block';
+                })
+                .catch(error => console.error('Error fetching today data:', error));
+        }
+
+        function loadLast30DaysData() {
+            const username = "{{ username }}";
+            fetch(`/data/last30days/${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    const categoriesLast30Days = data.map(item => item[0]);
+                    const amountsLast30Days = data.map(item => parseFloat(item[1]));
+
+                    if (categoriesLast30Days.length === 0 || amountsLast30Days.length === 0) {
+                        console.error("No data available for last 30 days chart.");
+                        return;
                     }
-                }
-            });
 
-            // Set chart size
-            expenditureChartToday.canvas.parentNode.style.width = '300px';
-            expenditureChartToday.canvas.parentNode.style.height = '300px';
-        })
-        .catch(error => console.error('Error fetching today data:', error));
-
-    // Fetch data for the last 30 days chart
-    fetch(`/data/last30days/${username}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Last 30 Days Data:", data); // Log data for debugging
-            const categoriesLast30Days = data.map(item => item[0]);
-            const amountsLast30Days = data.map(item => parseFloat(item[1]));
-
-            console.log("Categories Last 30 Days:", categoriesLast30Days); // Log categories
-            console.log("Amounts Last 30 Days:", amountsLast30Days); // Log amounts
-
-            if (categoriesLast30Days.length === 0 || amountsLast30Days.length === 0) {
-                console.error("No data available for last 30 days chart.");
-                return;
-            }
-
-            const ctxLast30Days = document.getElementById('expenditureChartLast30Days').getContext('2d');
-            const expenditureChartLast30Days = new Chart(ctxLast30Days, {
-                type: 'pie',
-                data: {
-                    labels: categoriesLast30Days,
-                    datasets: [{
-                        label: 'Expenditures by Category (Last 30 Days)',
-                        data: amountsLast30Days,
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    return `${label}: ${value}`;
+                    const ctxLast30Days = document.getElementById('expenditureChartLast30Days').getContext('2d');
+                    const expenditureChartLast30Days = new Chart(ctxLast30Days, {
+                        type: 'pie',
+                        data: {
+                            labels: categoriesLast30Days,
+                            datasets: [{
+                                label: 'Expenditures by Category (Last 30 Days)',
+                                data: amountsLast30Days,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            return `${label}: ${value}`;
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-            });
+                    });
 
-            // Set chart size
-            expenditureChartLast30Days.canvas.parentNode.style.width = '300px';
-            expenditureChartLast30Days.canvas.parentNode.style.height = '300px';
-        })
-        .catch(error => console.error('Error fetching last 30 days data:', error));
-});
+                    // Show the chart
+                    document.getElementById('expenditureChartLast30Days').style.display = 'block';
+                })
+                .catch(error => console.error('Error fetching last 30 days data:', error));
+        }
     </script>
-    
 </body>
 </html>
-
