@@ -4,6 +4,7 @@ import psycopg2
 from functools import wraps
 import secrets
 from datetime import datetime, timedelta
+import requests
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(24)  # Securely generated secret key
 
@@ -67,6 +68,18 @@ def create_table():
     """
     cur.execute(create_user_transaction_table_query)
     
+    create_crypto_transaction_table_query = """
+    CREATE TABLE IF NOT EXISTS CryptoTransaction (
+        CryptoId SERIAL PRIMARY KEY,
+        UserId INTEGER REFERENCES UserDetails(UserId),
+        CryptoName VARCHAR(255) NOT NULL,
+        CryptoAmount DECIMAL(18, 8) NOT NULL,
+        TransactionType VARCHAR(10) CHECK (TransactionType IN ('bought', 'sold')) NOT NULL,
+        TransactionDate DATE NOT NULL
+    );
+    """
+    cur.execute(create_crypto_transaction_table_query)
+
     con.commit()
 
 create_table()
@@ -302,7 +315,53 @@ def get_last_30_days_data(username):
         data = cursor.fetchall()
         print(data)
     return jsonify(data)
+@app.route('/update_crypto/<username>')
+@login_required
+def update_crypto(username):
+    cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+    con.commit()
+    userid = cur.fetchone()[0]
+    
+    cur.execute("SELECT * FROM CryptoTransaction WHERE UserId = %s;", (userid,))
+    con.commit()
+    transactions = cur.fetchall()
+    
+    return render_template('crypto.html', username=username, transactions=transactions)
 
+# Route to handle adding a new cryptocurrency transaction
+@app.route('/add_crypto_transaction/<username>', methods=['GET', 'POST'])
+@login_required
+def add_crypto_transaction(username):
+    if request.method == 'POST':
+        crypto_name = request.form['crypto_name']
+        crypto_amount = float(request.form['crypto_amount'])
+        transaction_type = request.form['transaction_type']
+        transaction_date = datetime.now().strftime('%Y-%m-%d')
+        
+        # Fetch the current price of the cryptocurrency
+        try:
+            response = requests.get(f'https://api.coingecko.com/api/v3/simple/price?ids={crypto_name}&vs_currencies=usd')
+            if response.ok:
+                data = response.json()
+                current_price = data[crypto_name]['usd']
+                total_amount = crypto_amount * current_price
+
+                # Get the user ID
+                cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+                con.commit()
+                userid = cur.fetchone()[0]
+                
+                # Insert the transaction into the database
+                cur.execute("INSERT INTO CryptoTransaction (UserId, CryptoName, CryptoAmount, TransactionType, TransactionDate) VALUES (%s, %s, %s, %s, %s);",
+                            (userid, crypto_name, total_amount, transaction_type, transaction_date))
+                con.commit()
+                return redirect(url_for('update_crypto'))
+            else:
+                print("Failed to fetch cryptocurrency price.")
+        except Exception as e:
+            print("Error fetching cryptocurrency price or adding transaction:", e)
+    
+    return render_template('crypto.html', username=username)
 if __name__ == '__main__':
     app.run(debug=True)
 

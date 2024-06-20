@@ -60,6 +60,7 @@
         .balance { background-color: rgb(248, 232, 255);}
         .transactions { background-color: rgb(248, 248, 209); }
         .stats { background-color: #f9eddb;}
+        .crypto {background-color: #c3f0f1; }
     </style>
 </head>
 <body>
@@ -98,6 +99,12 @@
                     <div class="card stats">
                         <h2 class="subhead">Stats</h2>
                         <p>view stats</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('update_crypto', username=username) }}">
+                    <div class="card crypto">
+                        <h2 class="subhead">UPDATE CRYPTO</h2>
+                        <p>BOUGTH/SOLD CRYPTO</p>
                     </div>
                 </a>
         </div>
