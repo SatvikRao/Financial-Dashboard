@@ -15,10 +15,10 @@
             padding: 0;
         }
         .container {
+            background-color: rgba(255, 255, 255, 0.65);
             max-width: 1200px;
             margin: 20px auto;
             padding: 20px;
-            background-color: #fff;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             border-radius: 8px;
             position: relative; /* Added for positioning the button inside */
@@ -59,23 +59,7 @@
         .savings { background-color: #e8f5e9; }
         .balance { background-color: rgb(248, 232, 255);}
         .transactions { background-color: rgb(248, 248, 209); }
-        .stats-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #f4ab9b;
-            color: rgb(2, 2, 2);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 1em;
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-        }
-        .stats-button:hover {
-            background-color: #b61a1a;
-        }
+        .stats { background-color: #f9eddb;}
     </style>
 </head>
 <body>
@@ -84,10 +68,12 @@
             <h1>Finance Dashboard</h1>
         </div>
         <div class="small">
+            <a href="{{ url_for('add_income', username=username) }}">
             <div class="card income">
                 <h2>Income</h2>
-                <p id="income-value" alt="0">${{income}}</p>
+                <p id="income-value" alt="0">${{income}}</p>             
             </div>
+            </a>
             <div class="card balance">
                 <h2>Balance</h2>
                 <p id="balance-value" alt="0">${{balance}}</p>
@@ -101,23 +87,20 @@
                 <h2>Savings</h2>
                 <p id="savings-value">0%</p>
             </div>
+            
+                <a href="{{ url_for('transactions', username=username) }}">
+                    <div class="card transactions">
+                        <h2 class="subhead">Transactions</h2>
+                        <p>{{transnum}} transaction/s made</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('view_stats', username=username) }}" >
+                    <div class="card stats">
+                        <h2 class="subhead">Stats</h2>
+                        <p>view stats</p>
+                    </div>
+                </a>
         </div>
-        <div>
-            <a href="{{ url_for('transactions', username=username) }}">
-                <div class="card transactions">
-                    <h2 class="subhead">Transactions</h2>
-                    <p>{{transnum}} transaction/s made</p>
-                </div>
-            </a>
-        </div>
-        <div>
-            <a href="{{ url_for('add_income', username=username) }}">
-                <div class="card transactions">
-                    <h2 class="subhead">Add Income</h2>
-                </div>
-            </a>
-        </div>
-        <a href="{{ url_for('view_stats', username=username) }}" class="stats-button">Click here to view stats</a>
     </div>
 </body>
 </html>
