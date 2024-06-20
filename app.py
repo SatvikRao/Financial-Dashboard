@@ -138,14 +138,19 @@ def home(username):
 
     cur.execute("SELECT SUM(UserTransaction.Amount) AS total_amount FROM UserTransaction JOIN UserDetails ON UserDetails.UserId = UserTransaction.UserId WHERE UserDetails.UserName = %s AND UserTransaction.TransactionType='deposit'", (username,))
     balance = cur.fetchone()
+    cur.execute("SELECT SUM(UserTransaction.Amount) AS total_amount FROM UserTransaction JOIN UserDetails ON UserDetails.UserId = UserTransaction.UserId WHERE UserDetails.UserName = %s AND UserTransaction.TransactionType='withdraw'", (username,))
+    balance2 = cur.fetchone()
+    if balance2 is None or balance2[0] is None:
+        balance2 = (0,)
     if balance is None or balance[0] is None:
         balance = (0,)
+    difference = balance[0] - balance2[0]
 
     cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName = %s;", (username,))
     transnum = cur.fetchone()
     if transnum is None or transnum[0] is None:
         transnum = (0,)
-    variable = balance[0]+income[0]
+    variable = difference+income[0]
     return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=variable)
 
 
