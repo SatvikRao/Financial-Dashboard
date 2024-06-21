@@ -80,6 +80,17 @@ def create_table():
     """
     cur.execute(create_crypto_transaction_table_query)
 
+    create_stock_transaction_table_query = """
+    CREATE TABLE IF NOT EXISTS StockTransaction (
+        StockId SERIAL PRIMARY KEY,
+        UserId INTEGER REFERENCES UserDetails(UserId),
+        StockName VARCHAR(255) NOT NULL,
+        StockAmount DECIMAL(10, 2) NOT NULL,
+        TransactionType VARCHAR(10) CHECK (TransactionType IN ('bought', 'sold')) NOT NULL,
+        TransactionDate DATE NOT NULL
+    );
+    """
+    cur.execute(create_stock_transaction_table_query)
     con.commit()
 
 create_table()
@@ -160,11 +171,30 @@ def home(username):
         balance = (0,)
     difference = balance[0] - balance2[0]
 
+    cur.execute("SELECT SUM(CryptoAmount) FROM CryptoTransaction JOIN UserDetails ON UserDetails.UserId = CryptoTransaction.UserId WHERE UserDetails.UserName = %s AND CryptoTransaction.TransactionType='sold';", (username,))
+    crypto_sold = cur.fetchone()
+    if crypto_sold is None or crypto_sold[0] is None:
+        crypto_sold = (0,)
+    cur.execute("SELECT SUM(CryptoAmount) FROM CryptoTransaction JOIN UserDetails ON UserDetails.UserId = CryptoTransaction.UserId WHERE UserDetails.UserName = %s AND CryptoTransaction.TransactionType='bought';", (username,))
+    crypto_bought = cur.fetchone()
+    if crypto_bought is None or crypto_bought[0] is None:
+        crypto_bought = (0,)
+    crypto_balance = crypto_sold[0] - crypto_bought[0]
+
+    cur.execute("SELECT SUM(StockAmount) FROM StockTransaction JOIN UserDetails ON UserDetails.UserId = StockTransaction.UserId WHERE UserDetails.UserName = %s AND StockTransaction.TransactionType='sold';", (username,))
+    stock_sold = cur.fetchone()
+    if stock_sold is None or stock_sold[0] is None:
+        stock_sold = (0,)
+    cur.execute("SELECT SUM(StockAmount) FROM StockTransaction JOIN UserDetails ON UserDetails.UserId = StockTransaction.UserId WHERE UserDetails.UserName = %s AND StockTransaction.TransactionType='bought';", (username,))
+    stock_bought = cur.fetchone()
+    if stock_bought is None or stock_bought[0] is None:
+        stock_bought = (0,)
+    stock_balance = stock_bought[0] - stock_sold[0]
     cur.execute("SELECT COUNT(*) AS transaction_count FROM UserTransaction JOIN UserDetails ON UserTransaction.UserId = UserDetails.UserId WHERE UserDetails.UserName = %s;", (username,))
     transnum = cur.fetchone()
     if transnum is None or transnum[0] is None:
         transnum = (0,)
-    variable = difference+income[0]
+    variable = difference+income[0]+crypto_balance-stock_balance
     return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=variable)
 
 
@@ -315,6 +345,7 @@ def get_last_30_days_data(username):
         data = cursor.fetchall()
         print(data)
     return jsonify(data)
+
 @app.route('/update_crypto/<username>')
 @login_required
 def update_crypto(username):
@@ -362,6 +393,56 @@ def add_crypto_transaction(username):
             print("Error fetching cryptocurrency price or adding transaction:", e)
     
     return render_template('crypto.html', username=username)
+
+@app.route('/update_stock/<username>')
+@login_required
+def update_stock(username):
+    cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+    con.commit()
+    userid = cur.fetchone()[0]
+    
+    cur.execute("SELECT * FROM StockTransaction WHERE UserId = %s;", (userid,))
+    con.commit()
+    transactions = cur.fetchall()
+    
+    return render_template('stock.html', username=username, transactions=transactions)
+
+@app.route('/add_stock_transaction/<username>', methods=['GET', 'POST'])
+@login_required
+def add_stock_transaction(username):
+    if request.method == 'POST':
+        stock_name = request.form['stock_name']
+        stock_amount = float(request.form['stock_amount'])
+        transaction_type = request.form['transaction_type']
+        transaction_date = datetime.now().strftime('%Y-%m-%d')
+        
+        try:
+            response = requests.get(f'https://api.twelvedata.com/price?symbol={stock_name}&apikey=07abf5199f644ea792f4382bc332dfc2')
+            if response.ok:
+                data = response.json()
+                current_price = float(data['price'])
+                total_amount = stock_amount * current_price
+
+                cur.execute("SELECT UserId FROM UserDetails WHERE UserName = %s;", (username,))
+                con.commit()
+                userid = cur.fetchone()[0]
+                
+                cur.execute("INSERT INTO StockTransaction (UserId, StockName, StockAmount, TransactionType, TransactionDate) VALUES (%s, %s, %s, %s, %s);",
+                            (userid, stock_name, total_amount, transaction_type, transaction_date))
+                con.commit()
+                return redirect(url_for('update_stock', username=username))
+            else:
+                print("Failed to fetch stock price.")
+        except Exception as e:
+            print("Error fetching stock price or adding transaction:", e)
+            
+    return redirect(url_for('update_stock', username=username))
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    session.pop('user_id', None)
+    return redirect(url_for('login'))
 if __name__ == '__main__':
     app.run(debug=True)
 

@@ -14,6 +14,21 @@
             margin: 0;
             padding: 0;
         }
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #ff7e5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .logout-btn:hover {
+            background-color: #feb47b;
+        }
         .container {
             background-color: rgba(255, 255, 255, 0.65);
             max-width: 1200px;
@@ -61,9 +76,11 @@
         .transactions { background-color: rgb(248, 248, 209); }
         .stats { background-color: #f9eddb;}
         .crypto {background-color: #c3f0f1; }
+        .stock {background-color: #f8bbd0; }
     </style>
 </head>
 <body>
+    <a href="/logout" class="logout-btn">Logout</a>
     <div class="container">
         <div class="header">
             <h1>Finance Dashboard</h1>
@@ -104,7 +121,13 @@
                 <a href="{{ url_for('update_crypto', username=username) }}">
                     <div class="card crypto">
                         <h2 class="subhead">UPDATE CRYPTO</h2>
-                        <p>BOUGTH/SOLD CRYPTO</p>
+                        <p>BOUGHT/SOLD CRYPTO</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('update_stock', username=username) }}">
+                    <div class="card stock">
+                        <h2 class="subhead">UPDATE STOCK</h2>
+                        <p>BOUGHT/SOLD STOCK</p>
                     </div>
                 </a>
         </div>
