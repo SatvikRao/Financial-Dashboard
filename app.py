@@ -50,8 +50,7 @@ def create_table():
         MoneyId SERIAL PRIMARY KEY,
         UserId INTEGER REFERENCES UserDetails(UserId),
         UserIncome DECIMAL(10,2) NOT NULL,
-        IncomeDate DATE NOT NULL,
-        TimePeriod VARCHAR(255) NOT NULL
+        IncomeDate DATE NOT NULL
     );
     """
     cur.execute(create_user_money_table_query)
