@@ -194,7 +194,8 @@ def home(username):
     if transnum is None or transnum[0] is None:
         transnum = (0,)
     variable = difference+income[0]+crypto_balance-stock_balance
-    return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=variable)
+    new = balance2[0]+crypto_bought[0]+stock_bought[0]
+    return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=variable, expenses = new)
 
 
 @app.route('/transactions/<username>', methods=['GET', 'POST'])
