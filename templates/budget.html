@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Budget</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .budget-table th, .budget-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .budget-table th {
+            background-color: #f2f2f2;
+        }
+        .home_butt {
+            display: inline-block; /* Display button as inline block */
+            margin-bottom: 10px; /* Add margin for spacing */
+            position: relative; /* Position button relative to its normal position */
+            left: 82%;
+            top: -5%;
+            font-size: large;
+            color: #72a6dd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monthly Budget</h1>
+    <a href="/home/{{username}}" class="home_butt">Go To Home</a>
+    <h2>Overall Budget: <span id="overallBudget">{{overall}}</span></h2>
+    <h2>Remaining Income: <span id="remainingIncome">{{remaining}}</span></h2>
+    
+    <h2>Budget Overview</h2>
+    <table class="budget-table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Housing</td>
+                <td id="displayHousing">{{housing}}</td>
+            </tr>
+            <tr>
+                <td>Food</td>
+                <td id="displayFood">{{food}}</td>
+            </tr>
+            <tr>
+                <td>Entertainment</td>
+                <td id="displayEntertainment">{{entertainment}}</td>
+            </tr>
+            <tr>
+                <td>Others</td>
+                <td id="displayOthers">{{others}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Update Budget</h2>
+    <form id="budgetForm">
+       
+        <label for="category">Category:</label><br>
+        <select id="category" name="category" required>
+            <option value="housing">Housing</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="food">Food</option>
+            <option value="others">Others</option>
+        </select>
+        
+        <label for="amount">Amount:</label><br>
+        <input type="number" id="amount" name="amount" required><br><br>
+        <label>&nbsp;</label>
+        <button type="submit">Update Budget</button>
+    </form>
+    
+</body>
+</html>

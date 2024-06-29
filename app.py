@@ -92,6 +92,17 @@ def create_table():
     cur.execute(create_stock_transaction_table_query)
     con.commit()
 
+    create_budget_table = """
+    CREATE TABLE IF NOT EXISTS Budget (
+        BudgetId SERIAL PRIMARY KEY,
+        UserId INTEGER REFERENCES UserDetails(UserId),
+        Category VARCHAR(255) NOT NULL,
+        BudgetAmount DECIMAL(10, 2) NOT NULL
+    );
+    """
+    cur.execute(create_budget_table)
+    con.commit()
+
 create_table()
 
 # Define a decorator to require authentication
@@ -195,7 +206,11 @@ def home(username):
         transnum = (0,)
     variable = difference+income[0]+crypto_balance-stock_balance
     new = balance2[0]+crypto_bought[0]+stock_bought[0]
-    return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=variable, expenses = new)
+    cur.execute("SELECT UserId from UserDetails WHERE UserName=%s;",(username,))
+    con.commit()
+    userid = cur.fetchone()
+    values = budgetvalues(userid)
+    return render_template('home.html', username=username, income=income[0], transnum=transnum[0], balance=variable, expenses = new, budget = values[4])
 
 
 @app.route('/transactions/<username>', methods=['GET', 'POST'])
@@ -437,6 +452,56 @@ def add_stock_transaction(username):
             print("Error fetching stock price or adding transaction:", e)
             
     return redirect(url_for('update_stock', username=username))
+
+@app.route('/budget/<username>', methods=['GET', 'POST'])
+@login_required
+def budget(username):
+    cur.execute("SELECT UserId from UserDetails WHERE UserName=%s;",(username,))
+    con.commit()
+    userid = cur.fetchone()
+    if request.method == 'POST':
+        category = request.form['category']
+        amount = request.form['amount']
+        updatevalues( userid , category , amount)
+
+    values = budgetvalues(userid )
+    save = values[4]-spent(userid)[0]
+    return render_template('budget.html',housing=values[0] , food = values[1] , entertainment=values[2] , others=values[3], overall=values[4], remaining=save, username=username)
+
+def updatevalues(userid , category , amount):
+    cur.execute("SELECT * FROM Budget WHERE UserId=%s AND Category=%s;",(userid , category))
+    con.commit()
+    prev = cur.fetchone()
+    if prev == None:
+        query = "INSERT INTO Budget (UserId , Category ,BudgetAmount) VALUES (%s ,%s ,%s);"
+        cur.execute(query,(userid , category ,amount))
+    else:
+        query = "UPDATE Budget SET BudgetAmount=%s WHERE UserId =%s AND Category=%s;"
+        cur.execute(query,(amount ,userid , category))
+    con.commit()
+
+def budgetvalues(userid):
+    cur.execute("SELECT Category , BudgetAmount FROM Budget WHERE UserId =%s",(userid,))
+    con.commit()
+    valuelist = cur.fetchall()
+    values=[0,0,0,0,0]
+    for i in valuelist:
+        if i[0]=='housing':
+            values[0]=i[1]
+        elif i[0]=='food':
+            values[1]=i[1]
+        elif i[0]=='entertainment':
+            values[2]=i[1]
+        elif i[0]=='others':
+            values[3]=i[1]
+    values[4]=values[0]+values[1]+values[2]+values[3]
+    return values
+
+def spent(userid):
+    cur.execute("SELECT SUM(Amount) AS total_amount FROM UserTransaction WHERE UserId = %s AND reason IN ('entertainment', 'others', 'electricity','food' ,'grocery', 'rent');",(userid,))
+    con.commit()
+    expense =cur.fetchone()
+    return expense
 
 @app.route('/logout')
 def logout():

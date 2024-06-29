@@ -71,7 +71,7 @@
         }
         .income { background-color: #e0f7fa; }
         .expenses { background-color: #ffebee; }
-        .savings { background-color: #e8f5e9; }
+        .budget { background-color: #e8f5e9; }
         .balance { background-color: rgb(248, 232, 255);}
         .transactions { background-color: rgb(248, 248, 209); }
         .stats { background-color: #f9eddb;}
@@ -101,10 +101,12 @@
                 <h2>Expenses</h2>
                 <p id="expenses-value" alt="0">${{expenses}}</p>
             </div>
-            <div class="card savings">
-                <h2>Savings</h2>
-                <p id="savings-value">0%</p>
+            <a href="{{ url_for('budget', username=username) }}">
+            <div class="card budget">
+                <h2>Budget</h2>
+                <p id="budget-value">${{budget}}</p>
             </div>
+            </a>
             
                 <a href="{{ url_for('transactions', username=username) }}">
                     <div class="card transactions">
