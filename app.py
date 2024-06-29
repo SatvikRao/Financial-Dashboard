@@ -458,7 +458,7 @@ def add_stock_transaction(username):
 def budget(username):
     cur.execute("SELECT UserId from UserDetails WHERE UserName=%s;",(username,))
     con.commit()
-    userid = cur.fetchone()
+    userid = cur.fetchone()[0]
     if request.method == 'POST':
         category = request.form['category']
         amount = request.form['amount']
@@ -472,7 +472,7 @@ def updatevalues(userid , category , amount):
     cur.execute("SELECT * FROM Budget WHERE UserId=%s AND Category=%s;",(userid , category))
     con.commit()
     prev = cur.fetchone()
-    if prev == None:
+    if prev == None or prev[0] == None:
         query = "INSERT INTO Budget (UserId , Category ,BudgetAmount) VALUES (%s ,%s ,%s);"
         cur.execute(query,(userid , category ,amount))
     else:
