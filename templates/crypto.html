@@ -76,11 +76,21 @@
             border: 1px solid white;
             text-align: center;
         }
+        .home_butt {
+            display: inline-block; /* Display button as inline block */
+            margin-bottom: 10px; /* Add margin for spacing */
+            position: relative; /* Position button relative to its normal position */
+            left: 82%;
+            top: -5%;
+            font-size: large;
+            color: #d95711;
+        }
     </style>
 </head>
 <body>
     <div id="price-container" class="price-container"></div>
     <div class="container">
+        <a href="/home/{{username}}" class="home_butt">Go To Home</a>
         <h1>Check Cryptocurrency Prices</h1>
         <select id="crypto-select">
             <option value="bitcoin">Bitcoin</option>

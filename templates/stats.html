@@ -26,10 +26,20 @@
             height: 300px;
             display: none;
         }
+        .home_butt {
+            display: inline-block; /* Display button as inline block */
+            margin-bottom: 10px; /* Add margin for spacing */
+            position: relative; /* Position button relative to its normal position */
+            left: 82%;
+            top: -5%;
+            font-size: large;
+            color: #d95711;
+        }
     </style>
 </head>
 <body>
     <div class="container-box">
+        <a href="/home/{{ username }}" class="home_butt">Go To Home</a>
         <div class="chart-box">
             <h2>Today's Expenditures</h2>
             <button onclick="loadTodayData()">Show Today's Expenditures</button>

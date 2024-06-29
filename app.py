@@ -407,7 +407,7 @@ def add_crypto_transaction(username):
         except Exception as e:
             print("Error fetching cryptocurrency price or adding transaction:", e)
     
-    return render_template('crypto.html', username=username)
+    return redirect(url_for('update_crypto', username=username))
 
 @app.route('/update_stock/<username>')
 @login_required
