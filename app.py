@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session , jsonify
 from psycopg2 import extras
 import psycopg2
+from decimal import Decimal
 from functools import wraps
 import secrets
 from datetime import datetime, timedelta
@@ -465,7 +466,9 @@ def budget(username):
         updatevalues( userid , category , amount)
 
     values = budgetvalues(userid )
-    save = values[4]-spent(userid)[0]
+    spent_amount = spent(userid)[0]  # Your code to get the spent amount
+    save = values[4] - Decimal(spent_amount)
+
     return render_template('budget.html',housing=values[0] , food = values[1] , entertainment=values[2] , others=values[3], overall=values[4], remaining=save, username=username)
 
 def updatevalues(userid , category , amount):
@@ -496,12 +499,21 @@ def budgetvalues(userid):
             values[3]=i[1]
     values[4]=values[0]+values[1]+values[2]+values[3]
     return values
-
 def spent(userid):
-    cur.execute("SELECT SUM(Amount) AS total_amount FROM UserTransaction WHERE UserId = %s AND reason IN ('entertainment', 'others', 'electricity','food' ,'grocery', 'rent');",(userid,))
+    cur.execute("""
+        SELECT SUM(Amount) AS total_amount
+        FROM UserTransaction
+        WHERE UserId = %s
+          AND reason IN ('entertainment', 'others', 'electricity', 'food', 'grocery', 'rent')
+          AND TO_CHAR(TransactionDate, 'YYYY-MM') = TO_CHAR(CURRENT_DATE, 'YYYY-MM')
+          AND transactiontype = 'withdraw';
+    """, (userid,))
     con.commit()
-    expense =cur.fetchone()
-    return expense
+    expense = cur.fetchone()
+    if expense is None or expense[0] is None:
+        return 0,
+    else:
+        return float(expense[0]),
 
 @app.route('/logout')
 def logout():
