@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session , jsonify
 from psycopg2 import extras
 import psycopg2
+import datetime
 from decimal import Decimal
 from functools import wraps
 import secrets
@@ -500,14 +501,17 @@ def budgetvalues(userid):
     values[4]=values[0]+values[1]+values[2]+values[3]
     return values
 def spent(userid):
+    current_datetime = datetime.now()
+    current_year_month = f"{current_datetime.year}-{current_datetime.month:02}"
+    
     cur.execute("""
         SELECT SUM(Amount) AS total_amount
         FROM UserTransaction
         WHERE UserId = %s
           AND reason IN ('entertainment', 'others', 'electricity', 'food', 'grocery', 'rent')
-          AND TO_CHAR(TransactionDate, 'YYYY-MM') = TO_CHAR(CURRENT_DATE, 'YYYY-MM')
+          AND TO_CHAR(TransactionDate, 'YYYY-MM') = %s
           AND transactiontype = 'withdraw';
-    """, (userid,))
+    """, (userid,current_year_month))
     con.commit()
     expense = cur.fetchone()
     if expense is None or expense[0] is None:
